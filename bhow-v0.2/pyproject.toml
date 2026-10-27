@@ -45,3 +45,5 @@ python_version = "3.12"
 strict = true
 mypy_path = "src"
 packages = ["bhow_core"]
+
+# Ruff and pytest optimization settings enabled
