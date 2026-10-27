@@ -42,3 +42,5 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+# Production readiness probe handlers mounted
