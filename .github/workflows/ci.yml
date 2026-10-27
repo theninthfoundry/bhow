@@ -4,6 +4,7 @@ permissions:
   contents: read
 jobs:
   test:
+    name: SQLite Unit & API Tests
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -19,7 +20,7 @@ jobs:
         run: ruff check src tests client && mypy --strict src/bhow_core
       - name: Unit and API tests
         run: pytest -q
-      - name: Schema migration smoke test
+      - name: Schema migration smoke test (SQLite)
         env:
           BH_APP_ENV: test
           BH_DATABASE_URL: sqlite:///./test_migration_ci.db
@@ -27,3 +28,69 @@ jobs:
         run: alembic upgrade head && alembic downgrade base && alembic upgrade head
       - name: Syntax
         run: python -m compileall -q src client tests
+
+  postgres-test:
+    name: PostgreSQL Migration & Schema Readiness
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: bhow_staging_test
+          POSTGRES_USER: bhow_user
+          POSTGRES_PASSWORD: bhow_test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    defaults:
+      run:
+        working-directory: bhow-v0.2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install -e '.[dev]' psycopg[binary] httpx
+      - name: Run PostgreSQL migrations (Upgrade -> Downgrade -> Upgrade)
+        env:
+          BH_APP_ENV: test
+          BH_DATABASE_URL: postgresql+psycopg://bhow_user:bhow_test_password@127.0.0.1:5432/bhow_staging_test
+          BH_ALLOW_DEV_AUTH: 'false'
+        run: |
+          alembic upgrade head
+          alembic downgrade base
+          alembic upgrade head
+      - name: Verify PostgreSQL schema readiness and unauthenticated denial
+        env:
+          BH_APP_ENV: test
+          BH_DATABASE_URL: postgresql+psycopg://bhow_user:bhow_test_password@127.0.0.1:5432/bhow_staging_test
+          BH_ALLOW_DEV_AUTH: 'false'
+        run: |
+          python -c "
+          from bhow_api.main import app
+          from fastapi.testclient import TestClient
+
+          client = TestClient(app)
+          # 1. Healthz probe
+          res = client.get('/healthz')
+          assert res.status_code == 200, f'healthz failed: {res.text}'
+
+          # 2. Readyz database & migration readiness check
+          res = client.get('/readyz')
+          assert res.status_code == 200, f'readyz failed: {res.text}'
+          assert res.json() == {'status': 'ready'}
+
+          # 3. Verify unauthenticated requests are denied
+          res = client.get('/v1/dogs')
+          assert res.status_code == 401, f'Expected 401 unauthenticated, got {res.status_code}'
+
+          res = client.get('/v1/care/events')
+          assert res.status_code == 401, f'Expected 401 unauthenticated, got {res.status_code}'
+
+          print('PostgreSQL migrations, /readyz schema readiness, and unauthenticated denial verified successfully!')
+          "
