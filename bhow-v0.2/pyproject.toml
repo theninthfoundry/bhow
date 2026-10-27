@@ -30,6 +30,10 @@ bhow_kb = ["data/*.json"]
 testpaths = ["tests"]
 pythonpath = ["src"]
 addopts = "-ra"
+filterwarnings = [
+  "ignore::DeprecationWarning:starlette.*:",
+  "ignore::DeprecationWarning:httpx.*:",
+]
 
 [tool.ruff]
 line-length = 100
