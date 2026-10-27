@@ -20,5 +20,3 @@
 ## Verification notes
 
 Executed locally in the preparation environment: `PYTHONPATH=src pytest -q` (21 passing in v0.2); Python compileall; Alembic SQLite upgrade → downgrade → upgrade; `alembic check` (no schema drift). The environment could not reach PyPI to download Ruff, so Ruff formatting/lint, MyPy, Flet UI runtime, dependency locking, PostgreSQL live migrations and actual deployment have **not** been executed. No paid providers or veterinary reviewer have been connected. This is a genuine working starter, not a fully finished or clinically approved application.
-
-<!-- Phase 2 Functional Gate: PASSED -->

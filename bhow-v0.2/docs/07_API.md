@@ -58,5 +58,3 @@ Authorization: Bearer <valid-token>
 - Pagination v2: keyset cursor and stable sort rather than offset on high-volume timeline.
 
 Generate client contracts from `openapi.json` with CI and schema-diff checks once teams split. Never hand-maintain a contradictory API list; this document is explanatory, code-generated schema is authoritative for implemented operations.
-
-<!-- API response contracts synced with OpenAPI spec -->

@@ -23,5 +23,3 @@ Assets: dog/caregiver relationship, notes, future medical records, future photos
 ## Abuse-case tests before adding welfare features
 
 Can a stalker recover exact animal/rescuer location from shared link, image EXIF or timeline? Can a bad actor mark rescued/captured dogs without vet authorization? Can fake clinics appear as 24-hour providers? Can another user query an image hash or notification token to infer identity? Can spoofed “vet-verified” records be submitted by a user? These are foundational go/no-go cases, not edge polish.
-
-<!-- STRIDE threat analysis review: complete -->

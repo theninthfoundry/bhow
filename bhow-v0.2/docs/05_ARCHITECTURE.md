@@ -71,5 +71,3 @@
 - Android-first may simplify launch in India, but Flet/native camera behavior must be tested on real Android models.
 - Preview client is not final design; interface remains swappable because business logic lives on backend.
 - Hosted IDP avoids unsafe custom password/OTP implementation; adds vendor and network dependency.
-
-<!-- C4 architecture model diagrams validated -->
