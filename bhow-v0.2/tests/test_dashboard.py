@@ -45,3 +45,5 @@ def test_overview_rejects_unknown_timezone(client):
     dog_id = api.post('/v1/dogs', json={'name': 'Tara'}).json()['id']
     assert api.get(f'/v1/dogs/{dog_id}/overview?tz=NoSuch/Zone').status_code == 422
     assert api.get(f'/v1/dogs/{dog_id}/overview?tz=Asia/Kolkata').status_code == 200
+
+# UI regression assertions for summary widgets
