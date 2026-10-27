@@ -19,7 +19,7 @@ def decode_cursor(raw: str, fields: tuple[type, ...]) -> tuple[object, ...]:
         if not isinstance(values, list) or len(values) != len(fields):
             raise ValueError("Cursor length mismatch")
         converted = []
-        for text, kind in zip(values, fields):
+        for text, kind in zip(values, fields, strict=True):
             if not isinstance(text, str):
                 raise ValueError("Invalid value")
             if kind is date:
