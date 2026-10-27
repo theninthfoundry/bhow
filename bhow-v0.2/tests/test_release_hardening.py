@@ -47,3 +47,12 @@ def test_dev_auth_is_never_permitted_in_staging():
 def test_utc_timestamps_are_timezone_aware():
     assert utcnow().tzinfo is UTC
     assert abs((datetime.now(UTC) - utcnow()).total_seconds()) < 2
+
+
+def test_backup_restore_rehearsal_on_active_db(client):
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+    from backup_restore import rehearse_backup_restore
+    from bhow_api.db import get_engine
+    assert rehearse_backup_restore(str(get_engine().url)) is True
