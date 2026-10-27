@@ -20,7 +20,13 @@ def create_app() -> FastAPI:
         docs_url="/docs" if settings.app_env in {"local", "test"} else None,
         redoc_url=None,
     )
-    app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_credentials=False, allow_methods=["GET", "POST", "PATCH", "DELETE"], allow_headers=["Authorization", "Content-Type", "X-Dev-User", "X-Request-ID"])
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+        allow_headers=["Authorization", "Content-Type", "X-Dev-User", "X-Request-ID", "Idempotency-Key", "idempotency-key"],
+    )
 
     @app.middleware("http")
     async def add_headers(request: Request, call_next):  # type: ignore[no-untyped-def]
