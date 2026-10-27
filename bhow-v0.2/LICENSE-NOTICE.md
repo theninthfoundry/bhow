@@ -1,0 +1,3 @@
+# Ownership and licensing notice
+
+This deliverable is an original project scaffold created for the requesting user. No third-party font files, stock imagery or AI-generated visual assets are bundled. The project does not include a blanket open-source license for redistribution, because the user intends to evaluate a commercial startup. Before publishing source code, decide ownership, licenses for any dependencies/assets, contributor agreements, trademark clearance for “Bhow,” and third-party model/dataset rights. Nothing in this repository certifies medical, veterinary, security, or legal compliance.
