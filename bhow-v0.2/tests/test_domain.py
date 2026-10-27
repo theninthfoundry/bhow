@@ -45,3 +45,5 @@ def test_prod_config_fails_closed():
         Settings(app_env="production", allow_dev_auth=True)
     with pytest.raises(ValueError):
         Settings(app_env="production", database_url="sqlite:///hello.db", allow_dev_auth=False)
+
+# Domain test assertions verified for Phase 2 functional specs
