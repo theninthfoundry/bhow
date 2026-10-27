@@ -12,13 +12,12 @@ services:
       retries: 8
     volumes:
       - bhow_db:/var/lib/postgresql/data
-  api:
+  migrate:
     build:
       context: ..
       dockerfile: ops/Dockerfile
-    ports:
-      - "127.0.0.1:8000:8000"
-    environment:
+    command: ["alembic", "upgrade", "head"]
+    environment: &api_env
       BH_APP_ENV: staging
       BH_ALLOW_DEV_AUTH: "false"
       BH_DATABASE_URL: postgresql+psycopg://bhow:${POSTGRES_PASSWORD:?set password}@db:5432/bhow
@@ -29,5 +28,20 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  api:
+    build:
+      context: ..
+      dockerfile: ops/Dockerfile
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment: *api_env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=2)"]
+      interval: 15s
+      timeout: 4s
+      retries: 4
 volumes:
   bhow_db:

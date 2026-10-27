@@ -12,5 +12,3 @@ format:
 	ruff check --fix src tests && ruff format src tests
 smoke:
 	python tools/smoke.py
-
-# Additional quality and lint targets defined

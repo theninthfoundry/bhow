@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bhow-care-os"
-version = "0.2.0"
+version = "0.3.1"
 description = "Bhow: privacy-aware canine care foundation and FastAPI backend"
 requires-python = ">=3.12"
 dependencies = [
@@ -45,5 +45,3 @@ python_version = "3.12"
 strict = true
 mypy_path = "src"
 packages = ["bhow_core"]
-
-# Ruff and pytest optimization settings enabled

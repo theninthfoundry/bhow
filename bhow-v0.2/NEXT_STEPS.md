@@ -24,5 +24,3 @@
 ## Non-negotiable production gates
 
 See `docs/19_LAUNCH_GATES.md`, `docs/20_THREAT_MODEL.md`, and `docs/29_CLIENT_MILESTONE.md`. No unsupported diagnosis, no false food safety assurance, and no automatically public stray-dog coordinates.
-
-<!-- Phase 3 Milestones: Production deployment and telemetry integration -->

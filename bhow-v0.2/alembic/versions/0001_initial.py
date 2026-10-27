@@ -70,5 +70,3 @@ def downgrade() -> None:
     op.drop_index("ix_caregiver_subject", table_name="dog_caregivers")
     op.drop_table("dog_caregivers")
     op.drop_table("dogs")
-
-# Migration downgrade safety checks added
