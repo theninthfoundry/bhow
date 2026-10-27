@@ -65,7 +65,7 @@ def test_dev_identity_rejects_proxied_requests():
 def test_cors_preflight_allows_idempotency_key(client):
     api, _ = client
     response = api.options(
-        "/v1/care/events",
+        "/v1/dogs/00000000-0000-0000-0000-000000000000/events",
         headers={
             "Origin": "http://localhost:3000",
             "Access-Control-Request-Method": "POST",
