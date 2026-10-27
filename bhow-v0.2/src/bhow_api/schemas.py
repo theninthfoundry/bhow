@@ -1,6 +1,6 @@
 """External contracts, distinct from persistence and domain models."""
 from datetime import date, datetime
-from typing import Generic, Literal, TypeVar
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -126,9 +126,6 @@ class DogOverview(BaseModel):
     status: Literal["records_only_no_clinical_assessment"]
 
 
-T = TypeVar("T")
-
-
-class CursorPage(BaseModel, Generic[T]):
+class CursorPage[T](BaseModel):
     items: list[T]
     next_cursor: str | None = None
