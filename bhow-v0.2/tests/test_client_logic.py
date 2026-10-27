@@ -1,5 +1,6 @@
 """Product state and safety messaging are testable without native UI dependencies."""
 import sys
+import pytest
 from datetime import date
 from pathlib import Path
 
@@ -31,11 +32,8 @@ def test_profile_switch_and_creation():
     assert s.selected['name'] == 'Tara'
     s.choose('1')
     assert s.selected['name'] == 'Kaju'
-    try:
+    with pytest.raises(ValueError):
         s.choose('guess')
-        assert False
-    except ValueError:
-        pass
 
 
 def test_care_overview_wording():
@@ -46,3 +44,8 @@ def test_care_overview_wording():
     assert safe_ingredient_status({'status': 'unknown'})[0] == 'NOT ASSESSED AS SAFE'
     assert safe_ingredient_status({'status': 'potential_hazard'})[0] == 'POTENTIAL HAZARD'
     assert safe_ingredient_status({'status': 'invalid'})[0] == 'NOT ASSESSED AS SAFE'
+
+
+def test_history_date_is_not_overdue():
+    from view_models import historical_date
+    assert historical_date("2026-10-20") == "20 Oct 2026"

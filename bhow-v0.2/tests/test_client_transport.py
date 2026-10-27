@@ -19,7 +19,7 @@ def test_local_preview_headers_do_not_become_remote_auth(monkeypatch):
     def respond(req: httpx.Request):
         assert req.headers.get('X-Dev-User') == 'flet-preview'
         assert 'Authorization' not in req.headers
-        return httpx.Response(200, json=[])
+        return httpx.Response(200, json={"items": [], "next_cursor": None})
 
     api = Api('http://localhost:8000', transport=httpx.MockTransport(respond))
     assert api.dogs() == []
