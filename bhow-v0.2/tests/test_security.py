@@ -42,3 +42,36 @@ def test_dev_identity_rejects_external_peer_and_forwarded_spoof():
     assert error.value.status_code == 403
     with pytest.raises(HTTPException):
         current_principal(_request("untrusted-proxy"), None, settings, "arbitrary")
+
+
+def test_dev_identity_rejects_proxied_requests():
+    settings = Settings(app_env="local", allow_dev_auth=True)
+    # Request from loopback (e.g. 127.0.0.1 reverse proxy) but carrying proxy headers
+    proxied_req = Request({
+        "type": "http",
+        "method": "GET",
+        "path": "/",
+        "headers": [(b"x-forwarded-for", b"198.51.100.1")],
+        "client": ("127.0.0.1", 54321),
+        "scheme": "http",
+        "server": ("127.0.0.1", 8000),
+    })
+    with pytest.raises(HTTPException) as error:
+        current_principal(proxied_req, None, settings, "owner_01")
+    assert error.value.status_code == 403
+    assert "reverse proxy" in str(error.value.detail).lower()
+
+
+def test_cors_preflight_allows_idempotency_key(client):
+    api, _ = client
+    response = api.options(
+        "/v1/care/events",
+        headers={
+            "Origin": "http://localhost:3000",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "authorization, content-type, idempotency-key",
+        },
+    )
+    assert response.status_code == 200
+    allow_headers = response.headers.get("access-control-allow-headers", "").lower()
+    assert "idempotency-key" in allow_headers
