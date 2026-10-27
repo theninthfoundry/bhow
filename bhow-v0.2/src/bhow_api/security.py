@@ -55,3 +55,5 @@ def current_principal(
         return Principal(subject=subject)
     except (jwt.PyJWTError, ValueError, OSError) as exc:
         raise HTTPException(status_code=401, detail="Invalid access token") from exc
+
+# Token expiration and revocation check helpers
