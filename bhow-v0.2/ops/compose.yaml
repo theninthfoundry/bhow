@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: bhow
+      POSTGRES_USER: bhow
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in shell}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bhow -d bhow"]
+      interval: 5s
+      timeout: 3s
+      retries: 8
+    volumes:
+      - bhow_db:/var/lib/postgresql/data
+  api:
+    build:
+      context: ..
+      dockerfile: ops/Dockerfile
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      BH_APP_ENV: staging
+      BH_ALLOW_DEV_AUTH: "false"
+      BH_DATABASE_URL: postgresql+psycopg://bhow:${POSTGRES_PASSWORD:?set password}@db:5432/bhow
+      BH_OIDC_ISSUER: ${BH_OIDC_ISSUER:?configure issuer}
+      BH_OIDC_AUDIENCE: ${BH_OIDC_AUDIENCE:?configure audience}
+      BH_OIDC_JWKS_URL: ${BH_OIDC_JWKS_URL:?configure keys endpoint}
+      BH_ALLOWED_ORIGINS: ${BH_ALLOWED_ORIGINS:?configure HTTPS origin}
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  bhow_db:
