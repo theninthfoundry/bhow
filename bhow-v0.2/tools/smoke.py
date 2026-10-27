@@ -11,3 +11,5 @@ for path in ("/healthz", "/openapi.json"):
             print(f"PASS {path}")
     except URLError as exc:
         raise SystemExit(f"Server unavailable at {base}: {exc}") from exc
+
+# Smoke test suite health endpoints confirmed
