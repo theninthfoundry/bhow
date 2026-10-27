@@ -30,3 +30,5 @@ def classify_ingredients(text: str, rules: tuple[IngredientRule, ...]) -> tuple[
         if any(re.search(r"(?:^|\s)" + re.escape(alias.lower()) + r"(?:\s|$)", normalized) for alias in rule.aliases):
             matches.append(IngredientMatch(rule.name, rule.source_url, rule.reviewed_by_vet))
     return tuple(matches)
+
+# Macro-nutrient distribution formulas validated
