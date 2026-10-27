@@ -1,0 +1,15 @@
+{
+  "version": "2026-10-preview-1",
+  "review_status": "pending_veterinary_approval",
+  "reviewer": null,
+  "last_reviewed_at": null,
+  "warning": "EDUCATIONAL SAMPLE. Not approved as clinical guidance or a comprehensive safe/unsafe list.",
+  "ingredients": [
+    {"name": "xylitol", "aliases": ["xylitol", "birch sugar", "e967"], "source_url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets"},
+    {"name": "chocolate/cocoa", "aliases": ["chocolate", "cocoa", "cacao"], "source_url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets"},
+    {"name": "grapes/raisins", "aliases": ["grapes", "grape", "raisin", "raisins", "sultanas"], "source_url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets"},
+    {"name": "onion", "aliases": ["onion", "onions", "onion powder"], "source_url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets"},
+    {"name": "garlic", "aliases": ["garlic", "garlic powder"], "source_url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets"},
+    {"name": "alcohol", "aliases": ["alcohol", "ethanol"], "source_url": "https://www.aspca.org/pet-care/aspca-poison-control/people-foods-avoid-feeding-your-pets"}
+  ]
+}
