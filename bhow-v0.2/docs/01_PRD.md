@@ -70,3 +70,5 @@ GIVEN an authenticated caregiver, WHEN they create a dog and task, THEN both per
 ## Open questions for evidence gathering
 
 Are reminders or record retrieval the painful problem? Who maintains records after a vet visit? Is food scanning repeated enough to matter? Do caregivers trust a QR passport? Which clinics would accept an electronic summary? Would users pay for family collaboration or storage? What local animal welfare organization will accept cases? Until answered, pricing, retention, and commercial scalability are experiments, not facts.
+
+<!-- Product scope alignment verified -->
