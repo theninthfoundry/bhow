@@ -67,7 +67,7 @@ def test_cors_preflight_allows_idempotency_key(client):
     response = api.options(
         "/v1/dogs/00000000-0000-0000-0000-000000000000/events",
         headers={
-            "Origin": "http://localhost:3000",
+            "Origin": "http://localhost:8550",
             "Access-Control-Request-Method": "POST",
             "Access-Control-Request-Headers": "authorization, content-type, idempotency-key",
         },
