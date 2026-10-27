@@ -8,6 +8,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from bhow_api.db import get_engine
 from bhow_api.config import get_settings
+from bhow_api.rate_limit import RateLimiterMiddleware
 from bhow_api.routers import account, care, dashboard, dogs, integrations, knowledge
 
 
@@ -20,6 +21,7 @@ def create_app() -> FastAPI:
         docs_url="/docs" if settings.app_env in {"local", "test"} else None,
         redoc_url=None,
     )
+    app.add_middleware(RateLimiterMiddleware, requests_per_minute=120)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_origins,

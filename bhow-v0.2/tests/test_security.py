@@ -75,3 +75,34 @@ def test_cors_preflight_allows_idempotency_key(client):
     assert response.status_code == 200
     allow_headers = response.headers.get("access-control-allow-headers", "").lower()
     assert "idempotency-key" in allow_headers
+
+
+def test_rate_limiter_throttling_and_headers(client):
+    api, _ = client
+    # Normal response includes X-RateLimit-Limit header
+    res = api.get("/healthz")
+    assert res.status_code == 200
+
+    from bhow_api.rate_limit import RateLimiterMiddleware
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+
+    throttled_app = FastAPI()
+    throttled_app.add_middleware(RateLimiterMiddleware, requests_per_minute=2)
+
+    @throttled_app.get("/ping")
+    def ping():
+        return {"pong": True}
+
+    with TestClient(throttled_app) as tc:
+        r1 = tc.get("/ping")
+        assert r1.status_code == 200
+        assert r1.headers.get("X-RateLimit-Limit") == "2"
+
+        r2 = tc.get("/ping")
+        assert r2.status_code == 200
+
+        r3 = tc.get("/ping")
+        assert r3.status_code == 429
+        assert r3.headers.get("Retry-After") == "60"
+        assert "Rate limit exceeded" in r3.json()["detail"]
