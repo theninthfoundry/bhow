@@ -31,14 +31,20 @@ def current_principal(
     dev_subject: Annotated[str | None, Header(alias="X-Dev-User")] = None,
 ) -> Principal:
     if settings.app_env == "local" and settings.allow_dev_auth and dev_subject:
-        # Only the actual ASGI peer may use a development identity. Never trust
-        # X-Forwarded-For (a client-controlled value in untrusted deployments).
+        # Development identity is strictly for direct localhost debugging.
+        # Reject if any proxy forwarding headers exist to prevent external ingress through loopback reverse proxies.
+        has_proxy_headers = any(
+            header in request.headers
+            for header in ("x-forwarded-for", "x-forwarded-host", "x-real-ip", "forwarded")
+        )
+        if has_proxy_headers:
+            raise HTTPException(status_code=403, detail="Development identity rejected behind reverse proxy")
         try:
             loopback_peer = request.client is not None and ip_address(request.client.host).is_loopback
         except ValueError:
             loopback_peer = False
         if not loopback_peer:
-            raise HTTPException(status_code=403, detail="Development identity requires a loopback peer")
+            raise HTTPException(status_code=403, detail="Development identity requires a direct loopback peer")
         if not (1 <= len(dev_subject) <= 128 and all(ch.isalnum() or ch in "_-.@" for ch in dev_subject)):
             raise HTTPException(status_code=400, detail="Invalid local development subject")
         return Principal(subject=f"dev:{dev_subject}")
