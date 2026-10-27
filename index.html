@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bhow | Dog care record and education preview</title>
+    <meta
+      name="description"
+      content="Bhow is a preview of a dog-care record and education platform. It is not veterinary diagnosis and the backend is not yet a public production service."
+    />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f8fafc;
+        --panel: #ffffff;
+        --text: #0f172a;
+        --muted: #334155;
+        --accent: #1d4ed8;
+        --border: #cbd5e1;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #020617;
+          --panel: #0f172a;
+          --text: #e2e8f0;
+          --muted: #cbd5e1;
+          --accent: #93c5fd;
+          --border: #334155;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        line-height: 1.6;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      main {
+        max-width: 52rem;
+        margin: 0 auto;
+        padding: 2rem 1rem 3rem;
+      }
+
+      section {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        margin-top: 1rem;
+      }
+
+      h1,
+      h2 {
+        line-height: 1.2;
+      }
+
+      h1 {
+        font-size: clamp(1.8rem, 3vw, 2.4rem);
+        margin-bottom: 0.5rem;
+      }
+
+      h2 {
+        margin-top: 0;
+        font-size: 1.2rem;
+      }
+
+      p,
+      li {
+        color: var(--muted);
+      }
+
+      .notice {
+        border-left: 0.4rem solid var(--accent);
+      }
+
+      a {
+        color: var(--accent);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Bhow</h1>
+        <p>
+          Dog-care record and education preview for owners and carers.
+        </p>
+      </header>
+
+      <section class="notice" aria-label="Safety notice">
+        <h2>Safety notice</h2>
+        <p>
+          Bhow content is educational only and is <strong>not veterinary diagnosis</strong>.
+          If a dog has urgent symptoms (for example collapse, breathing distress, or
+          suspected poisoning), contact a licensed veterinarian immediately.
+        </p>
+      </section>
+
+      <section aria-label="Current release status">
+        <h2>Current release status</h2>
+        <p>
+          This site is a static project landing page. The FastAPI backend is still in
+          preview and is <strong>not yet a public production service</strong>.
+        </p>
+        <ul>
+          <li>GitHub Pages publishes this static page only.</li>
+          <li>No user login or account features are provided on this page.</li>
+          <li>No medical or diagnostic claims are made for this preview.</li>
+        </ul>
+      </section>
+
+      <section aria-label="Project repository">
+        <h2>Project repository</h2>
+        <p>
+          For implementation details and deployment prerequisites, see the
+          <a href="README.md">repository README</a> and
+          <a href="docs/DEPLOYMENT.md">deployment guide</a>.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>

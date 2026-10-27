@@ -33,6 +33,8 @@ Open <http://127.0.0.1:8000/docs> and run `pytest -q` in another terminal. `.env
 
 See [`bhow-v0.2/docs/31_STAGING_AND_CI.md`](bhow-v0.2/docs/31_STAGING_AND_CI.md). Requires actual HTTPS endpoints, identity provider, database credentials, and a reverse proxy for public access. The supplied Docker Compose setup binds the API to loopback and does **not** create a public deployment.
 
+For deployment scope and verification steps, see [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md). GitHub Pages in this repository publishes a static landing page only and does not deploy the backend service.
+
 ## Architecture
 
 ```text
