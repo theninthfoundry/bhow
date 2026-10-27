@@ -1,0 +1,20 @@
+BHOW / KAJU                                  Share (later)
+───────────────────────────────────────────────────────
+KAJU'S PASSPORT
+One living story. Clear evidence.
+
+CARE RECORDS           [All]  [Visits]  [Tasks]
+
+ OCT 27 ─●──  Visit record
+             "Caregiver-reported visit..."
+             [YOU NOTED / UNVERIFIED]
+        │
+ OCT 21 ─●──  Weight measurement
+             [YOU NOTED / UNVERIFIED]
+        │
+ DEC 02 ─○──  Next appointment  [UPCOMING]
+
+[ + Add record ]      [ + Add task ]
+
+[ Export my dog’s data ]
+Future: verified by [credentialed clinician] is separate and audited.

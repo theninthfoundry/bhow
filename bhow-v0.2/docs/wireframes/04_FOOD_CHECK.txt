@@ -1,0 +1,15 @@
+BHOW / CHECK                                        01
+───────────────────────────────────────────────────────
+WHAT'S IN
+THIS FOOD?
+[ Ingredient text or confirmed OCR transcript          ]
+[ Check ingredient list                                ]
+
+[Status: POTENTIAL HAZARD]
+Known concern: raisins, cocoa         [source reference]
+A possible hazard was identified. The list is not exhaustive.
+
+IF ALREADY EATEN, CONTACT A VETERINARIAN NOW.
+
+Knowledge status: sample educational preview, vet review pending.
+No 'all clear', no toxic-dose calculator, no confetti.

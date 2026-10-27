@@ -1,0 +1,16 @@
+BHOW / FIELD NOTE 000                      Skip for now
+───────────────────────────────────────────────────────
+
+WHO ARE WE
+CARING FOR?
+
+[ Your dog's name                               ]
+
+[○ A dog at home] [○ Foster] [○ Community dog]
+
+Add details later: age • size • breed • photo (all optional)
+
+[           Start their care story           ]
+
+Consent: We don't need location or photos to get started.
+Design notes: one strong question, no mascots, no social sign-in wall.

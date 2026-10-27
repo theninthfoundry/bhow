@@ -1,0 +1,14 @@
+flowchart TD
+  C[Python Flet Mobile Client] -->|HTTPS OIDC Access Token| A[FastAPI API /v1]
+  A --> Z{Authorization Membership Check}
+  Z -->|Allowed| DB[(PostgreSQL - Care Records)]
+  Z -->|Denied| D[404 No Record Disclosure]
+  A --> CORE[Pure Python Domain Rules]
+  CORE --> KB[Versioned Reviewed Knowledge Base]
+  A --> P[Provider Ports - DISABLED until connected]
+  P -.-> M[ONNX Breed Model / Later]
+  P -.-> W[Licensed Weather / Later]
+  P -.-> S[Private Image Storage / Later]
+  A -.-> OUTBOX[Notification Outbox / Later]
+  OUTBOX -.-> WORKER[Push Worker / Later]
+  PARTNER[Verified Vet / NGO Portal - Later] -.-> A
