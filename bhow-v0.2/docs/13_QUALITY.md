@@ -28,3 +28,5 @@
 ## CI pipeline delivered
 
 See `.github/workflows/ci.yml` for lint, tests, migration upgrade/downgrade and bytecode compilation. **Not delivered:** SAST/secret scan/SBOM/DAST, actual Android matrix, dependency pinning/lock, Postgres CI service, perf test automation. These are listed as release blockers rather than presented as completed work.
+
+<!-- Coverage thresholds: >85% target -->
