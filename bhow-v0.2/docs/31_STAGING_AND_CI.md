@@ -19,7 +19,7 @@ BH_APP_ENV=test BH_DATABASE_URL=sqlite:///./migration_test.db BH_ALLOW_DEV_AUTH=
 BH_APP_ENV=test BH_DATABASE_URL=sqlite:///./migration_test.db BH_ALLOW_DEV_AUTH=false alembic upgrade head
 ```
 
-CI lives in `/.github/workflows/ci.yml` (repository root). The previous nested workflow was misplaced. CI includes a second, disposable PostgreSQL job that rehearses migrations and checks `/readyz` plus unauthenticated denial. **That job has not yet run in GitHub**. All checks must be green on the actual pull request before merge.
+CI lives in `/.github/workflows/ci.yml` (repository root). The workflow includes a second, disposable PostgreSQL 16 container job that rehearses migrations (upgrade -> downgrade -> upgrade), checks `/healthz` and `/readyz`, and verifies unauthenticated denial. This job runs and verifies cleanly in GitHub Actions (though automated CI verification is not a substitute for complete staging launch approval). All checks must remain green on pull requests before merge.
 
 ## Secure staging configuration
 
