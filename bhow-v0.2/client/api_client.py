@@ -62,7 +62,18 @@ class Api:
             raise ApiError("Can't connect to Bhow. Check your connection.") from exc
 
     def dogs(self) -> list[dict[str, Any]]:
-        return self.request("GET", "/v1/dogs")
+        result: list[dict[str, Any]] = []
+        cursor: str | None = None
+        for _ in range(100):
+            params: dict[str, Any] = {"limit": 100}
+            if cursor:
+                params["cursor"] = cursor
+            page = self.request("GET", "/v1/dogs/page", params=params)
+            result.extend(page["items"])
+            cursor = page.get("next_cursor")
+            if not cursor:
+                return result
+        raise ApiError("Profile list exceeds preview limits.")
 
     def add_dog(self, name: str, care_context: str) -> dict[str, Any]:
         return self.request("POST", "/v1/dogs", json={"name": name, "care_context": care_context})
@@ -76,14 +87,20 @@ class Api:
     def events(self, dog_id: str) -> list[dict[str, Any]]:
         return self.request("GET", f"/v1/dogs/{dog_id}/events")
 
-    def add_event(self, dog_id: str, kind: str, notes: str, occurred_on: str) -> dict[str, Any]:
-        return self.request("POST", f"/v1/dogs/{dog_id}/events", json={"kind": kind, "notes": notes, "occurred_on": occurred_on})
+    def add_event(self, dog_id: str, kind: str, notes: str, occurred_on: str,
+                  *, key: str | None = None) -> dict[str, Any]:
+        return self.request("POST", f"/v1/dogs/{dog_id}/events",
+                            headers={"Idempotency-Key": key} if key else None,
+                            json={"kind": kind, "notes": notes, "occurred_on": occurred_on})
 
     def tasks(self, dog_id: str) -> list[dict[str, Any]]:
         return self.request("GET", f"/v1/dogs/{dog_id}/tasks")
 
-    def add_task(self, dog_id: str, kind: str, title: str, due_on: str) -> dict[str, Any]:
-        return self.request("POST", f"/v1/dogs/{dog_id}/tasks", json={"kind": kind, "title": title, "due_on": due_on})
+    def add_task(self, dog_id: str, kind: str, title: str, due_on: str,
+                 *, key: str | None = None) -> dict[str, Any]:
+        return self.request("POST", f"/v1/dogs/{dog_id}/tasks",
+                            headers={"Idempotency-Key": key} if key else None,
+                            json={"kind": kind, "title": title, "due_on": due_on})
 
     def complete_task(self, dog_id: str, task_id: str) -> dict[str, Any]:
         return self.request("POST", f"/v1/dogs/{dog_id}/tasks/{task_id}/complete")
@@ -93,3 +110,17 @@ class Api:
 
     def outdoor_advice(self) -> dict[str, Any]:
         return self.request("GET", "/v1/outdoor/advice")
+
+
+    def events_page(self, dog_id: str, *, cursor: str | None = None, limit: int = 50) -> dict[str, Any]:
+        params = {"limit": limit}
+        if cursor:
+            params["cursor"] = cursor
+        return self.request("GET", f"/v1/dogs/{dog_id}/events/page", params=params)
+
+    def tasks_page(self, dog_id: str, *, cursor: str | None = None,
+                   limit: int = 50, status: str = "all") -> dict[str, Any]:
+        params = {"limit": limit, "status": status}
+        if cursor:
+            params["cursor"] = cursor
+        return self.request("GET", f"/v1/dogs/{dog_id}/tasks/page", params=params)

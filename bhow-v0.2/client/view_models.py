@@ -15,6 +15,11 @@ def friendly_date(value: str, today: date | None = None) -> str:
     return due.strftime("%d %b %Y")
 
 
+def historical_date(value: str) -> str:
+    """A past observation is not an overdue care task."""
+    return date.fromisoformat(value[:10]).strftime("%d %b %Y")
+
+
 def next_action(overview: dict[str, Any]) -> tuple[str, str]:
     tasks = overview.get("pending_tasks", [])
     if tasks:
@@ -39,5 +44,3 @@ def safe_ingredient_status(result: dict[str, Any]) -> tuple[str, str]:
 
 def short_date_now() -> str:
     return datetime.now().astimezone().date().isoformat()
-
-# Observable property bindings for pet dashboard

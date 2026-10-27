@@ -4,6 +4,7 @@ Preview release: no simulated care results, no fake clinic locations, no
 AI-generated photos, and no diagnostic or dietary prescriptions.
 """
 from datetime import date, datetime
+from uuid import uuid4
 
 import flet as ft
 
@@ -11,7 +12,7 @@ from api_client import Api, ApiError
 from components import caption, heading, kicker, panel, primary, quiet, rule
 from controller import CareController
 from tokens import COLORS
-from view_models import event_source, friendly_date, next_action, safe_ingredient_status
+from view_models import event_source, friendly_date, historical_date, next_action, safe_ingredient_status
 
 TABS = ("Today", "Passport", "Check", "Explore")
 
@@ -41,6 +42,7 @@ def main(page: ft.Page) -> None:
 
     tab_index = 0
     message = ""
+    passport_cache: dict[str, dict[str, object]] = {}
 
     def set_message(value: str) -> None:
         nonlocal message
@@ -131,6 +133,7 @@ def main(page: ft.Page) -> None:
 
         def submit(_):
             if do(lambda: state.create(dog_name.value or "", care_type.value or "owned"), "Profile created"):
+                passport_cache.clear()
                 page.pop_dialog()
                 render()
             else:
@@ -165,6 +168,7 @@ def main(page: ft.Page) -> None:
         if not state.selected_id:
             return
         dog_id = state.selected_id
+        request_key = str(uuid4())
         title = ft.TextField(label="What needs doing?", max_length=140)
         kind = ft.Dropdown(
             label="Type", value="appointment",
@@ -187,10 +191,11 @@ def main(page: ft.Page) -> None:
         def submit(_):
             if do(
                 lambda: state.api.add_task(
-                    dog_id, kind.value or "other", (title.value or "").strip(), due["date"].isoformat()
+                    dog_id, kind.value or "other", (title.value or "").strip(), due["date"].isoformat(), key=request_key
                 ),
                 "Care reminder added",
             ):
+                passport_cache.pop(dog_id, None)
                 page.pop_dialog()
                 render()
             else:
@@ -217,6 +222,7 @@ def main(page: ft.Page) -> None:
         if not state.selected_id:
             return
         dog_id = state.selected_id
+        request_key = str(uuid4())
         kind = ft.Dropdown(
             label="What happened?", value="other",
             options=[ft.DropdownOption(key=k, text=k.title()) for k in
@@ -232,9 +238,10 @@ def main(page: ft.Page) -> None:
                 page.update()
                 return
             if do(
-                lambda: state.api.add_event(dog_id, kind.value or "other", notes.value.strip(), date_value),
+                lambda: state.api.add_event(dog_id, kind.value or "other", notes.value.strip(), date_value, key=request_key),
                 "Caregiver observation saved",
             ):
+                passport_cache.pop(dog_id, None)
                 page.pop_dialog()
                 render()
             else:
@@ -318,8 +325,33 @@ def main(page: ft.Page) -> None:
         ]
 
     def screen_passport() -> list[ft.Control]:
-        events = state.api.events(state.selected_id)
-        tasks = state.api.tasks(state.selected_id)
+        selected = state.selected_id
+        if selected is None:
+            return []
+        cached = passport_cache.get(selected)
+        if cached is None:
+            cached = {"events": state.api.events_page(selected), "tasks": state.api.tasks_page(selected)}
+            passport_cache[selected] = cached
+        event_page = cached["events"]
+        task_page = cached["tasks"]
+        events = event_page["items"]
+        tasks = task_page["items"]
+
+        def older_events(_):
+            cursor = event_page.get("next_cursor")
+            if cursor:
+                nxt = state.api.events_page(selected, cursor=cursor)
+                event_page["items"].extend(nxt["items"])
+                event_page["next_cursor"] = nxt["next_cursor"]
+                render()
+
+        def older_tasks(_):
+            cursor = task_page.get("next_cursor")
+            if cursor:
+                nxt = state.api.tasks_page(selected, cursor=cursor)
+                task_page["items"].extend(nxt["items"])
+                task_page["next_cursor"] = nxt["next_cursor"]
+                render()
         name = state.selected["name"] if state.selected else "Your dog"
         controls: list[ft.Control] = [
             kicker("ONE LIFE, ONE STORY"),
@@ -335,15 +367,18 @@ def main(page: ft.Page) -> None:
                 panel(
                     ft.Row(
                         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                        controls=[kicker(event["kind"]), caption(friendly_date(event["occurred_on"]))],
+                        controls=[kicker(event["kind"]), caption(historical_date(event["occurred_on"]))],
                     ),
                     ft.Text(event["notes"], size=15, color=COLORS.ink),
                     caption(event_source(event)),
                 )
             )
+        if event_page.get("next_cursor"):
+            controls.append(quiet("Load older care notes", older_events))
         controls.extend([
             rule(), kicker("ALL REMINDERS"),
             *([task_row(t) for t in tasks] or [panel(caption("No reminders recorded."))]),
+            *([quiet("Load more reminders", older_tasks)] if task_page.get("next_cursor") else []),
             quiet("+ Plan care", lambda _: open_task_form()),
         ])
         return controls
