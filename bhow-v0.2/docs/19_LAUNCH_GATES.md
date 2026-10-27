@@ -9,8 +9,8 @@
 - [x] Database migration and starter CI definition.
 - [x] API can reject missing auth and production misconfiguration.
 - [ ] OIDC sign-in, native secure token storage, refresh, logout, account deletion at IDP.
-- [x] Rate limiting, endpoint throttling and abuse prevention (RateLimiterMiddleware with Retry-After).
-- [x] Database snapshot and transactional restore rehearsal tooling (tools/backup_restore.py).
+- [ ] Rate limiting, abuse prevention and budget controls on public/AI endpoints (In-memory prototype implemented; Redis/gateway shared limits required for multi-instance production).
+- [ ] Centralized monitoring, incident response, encrypted backups and restore rehearsal (Production blocker: managed PostgreSQL backup and restore verification outstanding).
 - [ ] Dependency lock committed, SBOM, vulnerability and secret scanning, penetration test.
 - [ ] Full hosted Postgres migration tests, zero-downtime release rollback, observability.
 - [ ] Real device UX, all primary production screens, accessibility, locale and offline-state tests.
