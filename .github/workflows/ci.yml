@@ -89,7 +89,10 @@ jobs:
           res = client.get('/v1/dogs')
           assert res.status_code == 401, f'Expected 401 unauthenticated, got {res.status_code}'
 
-          res = client.get('/v1/care/events')
+          res = client.get('/v1/dogs/00000000-0000-0000-0000-000000000000/events')
+          assert res.status_code == 401, f'Expected 401 unauthenticated, got {res.status_code}'
+
+          res = client.get('/v1/account/me')
           assert res.status_code == 401, f'Expected 401 unauthenticated, got {res.status_code}'
 
           print('PostgreSQL migrations, /readyz schema readiness, and unauthenticated denial verified successfully!')
