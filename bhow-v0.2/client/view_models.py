@@ -39,3 +39,5 @@ def safe_ingredient_status(result: dict[str, Any]) -> tuple[str, str]:
 
 def short_date_now() -> str:
     return datetime.now().astimezone().date().isoformat()
+
+# Observable property bindings for pet dashboard
