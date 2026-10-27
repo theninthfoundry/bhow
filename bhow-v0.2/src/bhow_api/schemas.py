@@ -106,3 +106,5 @@ class DogOverview(BaseModel):
     recent_events: list[EventOut]
     generated_on: date
     status: Literal["records_only_no_clinical_assessment"]
+
+# Extended payload validation models for client transport
