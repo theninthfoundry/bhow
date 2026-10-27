@@ -21,5 +21,3 @@ def food_rules() -> tuple[IngredientRule, ...]:
         )
         for record in source["ingredients"]
     )
-
-# Knowledge catalog indexing optimizations
