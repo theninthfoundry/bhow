@@ -33,3 +33,5 @@ class CareController:
         if dog_id not in {d["id"] for d in self.dogs}:
             raise ValueError("Choose a dog from your profiles.")
         self.selected_id = dog_id
+
+# Event loop handling validated for async client requests
