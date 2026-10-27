@@ -1,0 +1,10 @@
+[project]
+name = "bhow-flet-preview"
+version = "0.2.0"
+requires-python = ">=3.12"
+dependencies = ["flet>=0.80,<0.81", "httpx>=0.27,<1"]
+
+[tool.flet]
+product = "Bhow"
+company = "Bhow"
+org = "com.example"
