@@ -1,21 +1,24 @@
-# Bhow v0.3 — audit-fix release notes
+# Bhow v0.3.1 — Audit Fix Release Notes
 
-**Base repository:** `theninthfoundry/bhow` main @ `4d0d476791a7df6e7584bb79d7ab779f3bce3031`.
+**Repository:** `theninthfoundry/bhow` on `main`.
 
-This is an updated source package, **not an update pushed to GitHub**. The GitHub connector has read access but no push permission. The working project is intentionally kept in the existing `bhow-v0.2/` directory to avoid breaking current import and build paths; application metadata identifies v0.3.
+This release integrates and documents the audit remediation updates for Bhow v0.3.1, incorporating root-level CI, PostgreSQL migration verification, database-backed idempotency, CORS preflight compatibility, and proxy-boundary authentication hardening.
 
-## Changes
+## Audit Fixes & Enhancements
 
-- Development auth requests from non-loopback ASGI peers now fail HTTP 403 (don't expose loopback through public proxies).
-- CI workflow moved to repository root; working directory set to nested package.
-- Complete cursor-paginated dog, care-event and task APIs; task status filters.
-- Database-backed idempotency on event/task creates, including conflict detection.
-- Client passes repeat-stable idempotency keys and offers Load more on passport history.
-- Name normalization, E-967 additive variant, corrected date formatting.
-- Migration 0002, Compose migration job, database/schema readiness endpoint.
-- Root README, updated API documentation, regression tests.
+- **CI Workflow & PostgreSQL Container Job:** Root-level GitHub Actions workflow (`.github/workflows/ci.yml`) executes:
+  - SQLite unit and API test suites.
+  - PostgreSQL container job with automated migration cycles (`upgrade head -> downgrade base -> upgrade head`).
+  - PostgreSQL schema readiness check (`/readyz`) and unauthenticated denial assertions.
+- **CORS Configuration:** Added `Idempotency-Key` (and `idempotency-key`) to allowed CORS headers to guarantee browser client preflight compatibility for retry-safe operations.
+- **Development Authentication Boundary:** Hardened `security.py` to reject reverse-proxy forwarding headers (`X-Forwarded-For`, `X-Forwarded-Host`, `X-Real-IP`, `Forwarded`) on development authentication, preventing external spoofing when running behind loopback proxies.
+- **Cursor Pagination:** Complete cursor-paginated dog, care-event and task APIs with status filtering.
+- **Database-Backed Idempotency:** Added migration `0002_idempotency.py` and idempotency tracking for event/task creation.
+- **Database Readiness:** `/readyz` probe validates current migration schema (`0002`) and core tables.
+- **Client Reliability:** Client supplies repeat-stable idempotency keys and supports incremental history pagination.
+- **Documentation Reconciliation:** Synchronized root `README.md`, `31_STAGING_AND_CI.md`, and release documentation with the live repository commit history.
 
-## Run locally
+## Local Run & Verification
 
 ```bash
 cd bhow-v0.2
@@ -26,25 +29,10 @@ uvicorn bhow_api.main:app --host 127.0.0.1 --reload
 pytest -q
 ```
 
-## Verification
+## Production Launch Blockers (Not Ready for Public Rollout)
 
-- Pytest: 30 passed; 0 failed.
-- Python compileall: passed.
-- SQLite upgrade/downgrade/upgrade: passed.
-- SQLite `/readyz` and `/healthz`: HTTP 200 after migration.
-- Ruff/mypy: not run (unavailable in sandbox, installation unavailable). Tests need green CI after upload.
-- Physical Flet app / Android, Docker, PostgreSQL and real OIDC: not tested.
-
-## Still not ready for public rollout
-
-OIDC PKCE + Android secure token storage/revocation; complete deletion workflows; async Flet UI; clinically reviewed food reference; real provider integrations; live Postgres staging, production privacy/security review. See `bhow-v0.2/docs/30_V03_AUDIT_REMEDIATION.md`.
-
-## Applying to your repository
-
-1. On your computer clone `https://github.com/theninthfoundry/bhow`.
-2. Create a new branch from `main`: `git switch -c fix/v03-reliability`.
-3. Copy this package's root `.github/` and README, and replace the `bhow-v0.2/` project directory.
-4. Run `pytest -q`, `alembic upgrade head`, and CI lint/type checks.
-5. Commit and open a PR, check Actions and approve only after staging testing.
-
-Do not overwrite any later changes you have independently made without reviewing a diff.
+As documented in [19_LAUNCH_GATES.md](bhow-v0.2/docs/19_LAUNCH_GATES.md) and [31_STAGING_AND_CI.md](bhow-v0.2/docs/31_STAGING_AND_CI.md), the following gates remain required before public deployment:
+1. **Mobile PKCE & Credential Storage:** Full OIDC authorization code flow with PKCE, token refresh, revocation, and secure hardware storage on Android.
+2. **Managed PostgreSQL Staging:** Live persistent PostgreSQL deployment with verified automated backups and disaster-recovery restoration rehearsals.
+3. **Veterinary Content Review:** Formal clinical review of food ingredient hazards and emergency medical guidance by licensed veterinary professionals.
+4. **Security & Operations:** Rate limiting, production reverse-proxy TLS termination, security scanning, privacy policy review, and end-to-end data export/deletion workflows.
