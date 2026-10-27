@@ -1,0 +1,29 @@
+name: Bhow verification
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: bhow-v0.2
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install
+        run: python -m pip install -e '.[dev]'
+      - name: Lint
+        run: ruff check src tests client && mypy --strict src/bhow_core
+      - name: Unit and API tests
+        run: pytest -q
+      - name: Schema migration smoke test
+        env:
+          BH_APP_ENV: test
+          BH_DATABASE_URL: sqlite:///./test_migration_ci.db
+          BH_ALLOW_DEV_AUTH: 'false'
+        run: alembic upgrade head && alembic downgrade base && alembic upgrade head
+      - name: Syntax
+        run: python -m compileall -q src client tests
