@@ -40,3 +40,5 @@ Never place full GPS, personal phone numbers, veterinary histories or home locat
 ## Account deletion caveat
 
 `DELETE /v1/account/me` deletes only the current MVP's solely-owned local records. It is **not** a production-complete data-erasure workflow: external IDP users, queued notifications, partner records, object storage and backups require dedicated orchestration and retention treatment. Do not expose it as a full compliance promise before that orchestration is built.
+
+<!-- Data encryption at rest and transit guidelines -->
