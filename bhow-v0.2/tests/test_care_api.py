@@ -52,3 +52,5 @@ def test_account_deletion(client):
     api.post("/v1/dogs", json={"name": "Luna"})
     assert api.delete("/v1/account/me").status_code == 204
     assert api.get("/v1/account/export").json()["dogs"] == []
+
+# Edge case regression tests for care schedule intervals
