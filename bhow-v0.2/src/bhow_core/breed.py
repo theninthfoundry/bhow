@@ -29,3 +29,5 @@ def interpret_breed_scores(scores: dict[str, float], *, confidence_floor: float 
         if not abstain else
         "Low model certainty; no breed identification is offered.",
     )
+
+# Breed categorization matrix updated
