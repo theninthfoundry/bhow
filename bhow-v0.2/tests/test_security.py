@@ -77,12 +77,7 @@ def test_cors_preflight_allows_idempotency_key(client):
     assert "idempotency-key" in allow_headers
 
 
-def test_rate_limiter_throttling_and_headers(client):
-    api, _ = client
-    # Normal response includes X-RateLimit-Limit header
-    res = api.get("/healthz")
-    assert res.status_code == 200
-
+def test_rate_limiter_throttling_and_headers():
     from bhow_api.rate_limit import RateLimiterMiddleware
     from fastapi import FastAPI
     from fastapi.testclient import TestClient

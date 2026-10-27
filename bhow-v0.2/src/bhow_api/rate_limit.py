@@ -15,8 +15,10 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
         self._lock = Lock()
 
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
-        # Never throttle internal operational probes
-        if request.url.path in {"/healthz", "/readyz"}:
+        # Never throttle internal operational probes or test environments
+        if request.url.path in {"/healthz", "/readyz"} or getattr(
+            request.app.state, "disable_rate_limit", False
+        ):
             return await call_next(request)
 
         # Identify client by dev/auth header or peer IP
@@ -41,6 +43,12 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
 
             timestamps.append(now)
             self._history[client_key] = timestamps
+
+            # Prune inactive client keys to prevent unbounded memory growth
+            if len(self._history) > 500:
+                inactive = [k for k, v in self._history.items() if not v or v[-1] <= cutoff]
+                for k in inactive:
+                    del self._history[k]
 
         response = await call_next(request)
         response.headers["X-RateLimit-Limit"] = str(self.requests_per_minute)

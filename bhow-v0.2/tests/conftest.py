@@ -15,6 +15,7 @@ def client():
     engine = create_engine("sqlite+pysqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
     Base.metadata.create_all(bind=engine)
     app = create_app()
+    app.state.disable_rate_limit = True
     who = {"sub": "user-a"}
 
     def session_override():
