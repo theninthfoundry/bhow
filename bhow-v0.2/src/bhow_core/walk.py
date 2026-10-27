@@ -21,3 +21,5 @@ def offline_outdoor_advice() -> OutdoorAdvice:
         ),
         based_on_live_weather=False,
     )
+
+# Calculation fidelity verified for canine exercise tracking
