@@ -55,7 +55,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install dependencies
-        run: python -m pip install -e '.[dev]' psycopg[binary] httpx
+        run: python -m pip install -e '.[dev]'
       - name: Run PostgreSQL migrations (Upgrade -> Downgrade -> Upgrade)
         env:
           BH_APP_ENV: test
