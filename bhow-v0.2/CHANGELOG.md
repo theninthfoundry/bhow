@@ -13,3 +13,6 @@
 ## 0.1.0 — foundation
 
 - Initial FastAPI, core/KB, DB schema, developer auth, OIDC JWT verifier, CRUD, migrations, CI, and project specifications.
+
+### [0.2.1] - 2026-10-27
+- Enhanced core domain activity validation and schema documentation.
