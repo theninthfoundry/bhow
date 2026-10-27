@@ -2,7 +2,6 @@
 import hashlib
 import json
 from collections.abc import Callable
-from typing import TypeVar
 
 from fastapi import HTTPException
 from sqlalchemy import select
@@ -11,12 +10,16 @@ from sqlalchemy.orm import Session
 
 from bhow_api.models import IdempotencyRecord
 
-T = TypeVar("T")
 
-
-def persist_once(
-    db: Session, *, actor: str, dog_id: str, operation: str,
-    key: str | None, payload: dict[str, object], create: Callable[[], T],
+def persist_once[T](
+    db: Session,
+    *,
+    actor: str,
+    dog_id: str,
+    operation: str,
+    key: str | None,
+    payload: dict[str, object],
+    create: Callable[[], T],
     lookup: Callable[[str], T | None],
 ) -> T:
     if key is None:
