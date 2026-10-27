@@ -1,5 +1,5 @@
 """Persistence representations. NEVER infer verification from a user's claim."""
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from uuid import uuid4
 
 from sqlalchemy import Boolean, Date, DateTime, ForeignKey, Index, Numeric, String, Text, UniqueConstraint
@@ -13,7 +13,7 @@ def uid() -> str:
 
 
 def utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class Dog(Base):
@@ -74,3 +74,18 @@ class CareTask(Base):
     scheduled_by: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     dog: Mapped[Dog] = relationship(back_populates="tasks")
+
+
+class IdempotencyRecord(Base):
+    """A committed response pointer. Unique DB constraint serializes concurrent retries."""
+    __tablename__ = "idempotency_records"
+    __table_args__ = (UniqueConstraint("actor", "dog_id", "operation", "request_key", name="uq_idempotency_scope"),)
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    actor: Mapped[str] = mapped_column(String(255), nullable=False)
+    dog_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    operation: Mapped[str] = mapped_column(String(30), nullable=False)
+    request_key: Mapped[str] = mapped_column(String(128), nullable=False)
+    payload_digest: Mapped[str] = mapped_column(String(64), nullable=False)
+    result_id: Mapped[str] = mapped_column(String(36), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)

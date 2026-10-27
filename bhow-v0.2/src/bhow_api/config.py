@@ -1,6 +1,7 @@
 """Deployment configuration, with fail-closed production validation."""
 from functools import lru_cache
 from typing import Literal
+from urllib.parse import urlsplit
 
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -30,8 +31,19 @@ class Settings(BaseSettings):
                 raise ValueError("Staging/production require PostgreSQL via psycopg")
             if not all((self.oidc_issuer, self.oidc_audience, self.oidc_jwks_url)):
                 raise ValueError("Staging/production require OIDC issuer, audience and JWKS URL")
-            if any(x == "*" or "localhost" in x or not x.startswith("https://") for x in self.cors_origins):
-                raise ValueError("Staging/production CORS must list HTTPS origins, not wildcard")
+            if not self.cors_origins:
+                raise ValueError("Staging/production require at least one HTTPS CORS origin")
+            for origin in self.cors_origins:
+                parsed = urlsplit(origin)
+                if (parsed.scheme != "https" or not parsed.hostname or
+                        parsed.username or parsed.password or parsed.path not in {"", "/"} or
+                        parsed.query or parsed.fragment or
+                        parsed.hostname.lower() in {"localhost", "127.0.0.1", "::1"}):
+                    raise ValueError("Staging/production CORS requires valid HTTPS public origins")
+            for auth_url in (self.oidc_issuer, self.oidc_jwks_url):
+                parsed = urlsplit(auth_url or "")
+                if parsed.scheme != "https" or not parsed.hostname or parsed.username or parsed.password:
+                    raise ValueError("Staging/production OIDC URLs must use valid HTTPS endpoints")
         return self
 
 

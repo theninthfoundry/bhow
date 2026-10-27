@@ -1,10 +1,11 @@
 """External OIDC access tokens; local dev-header is explicit and blocked outside local."""
 from dataclasses import dataclass
 from functools import lru_cache
+from ipaddress import ip_address
 from typing import Annotated
 
 import jwt
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, Header, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from jwt import PyJWKClient
 
@@ -24,11 +25,20 @@ def _jwks_client(url: str) -> PyJWKClient:
 
 
 def current_principal(
+    request: Request,
     token: Annotated[HTTPAuthorizationCredentials | None, Depends(bearer)],
     settings: Annotated[Settings, Depends(get_settings)],
     dev_subject: Annotated[str | None, Header(alias="X-Dev-User")] = None,
 ) -> Principal:
     if settings.app_env == "local" and settings.allow_dev_auth and dev_subject:
+        # Only the actual ASGI peer may use a development identity. Never trust
+        # X-Forwarded-For (a client-controlled value in untrusted deployments).
+        try:
+            loopback_peer = request.client is not None and ip_address(request.client.host).is_loopback
+        except ValueError:
+            loopback_peer = False
+        if not loopback_peer:
+            raise HTTPException(status_code=403, detail="Development identity requires a loopback peer")
         if not (1 <= len(dev_subject) <= 128 and all(ch.isalnum() or ch in "_-.@" for ch in dev_subject)):
             raise HTTPException(status_code=400, detail="Invalid local development subject")
         return Principal(subject=f"dev:{dev_subject}")
@@ -55,5 +65,3 @@ def current_principal(
         return Principal(subject=subject)
     except (jwt.PyJWTError, ValueError, OSError) as exc:
         raise HTTPException(status_code=401, detail="Invalid access token") from exc
-
-# Token expiration and revocation check helpers

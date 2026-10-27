@@ -1,9 +1,9 @@
 """External contracts, distinct from persistence and domain models."""
 from datetime import date, datetime
-from typing import Literal
+from typing import Generic, Literal, TypeVar
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class DogCreate(BaseModel):
@@ -13,6 +13,14 @@ class DogCreate(BaseModel):
     breed_reported: str | None = Field(default=None, max_length=120)
     weight_kg: float | None = Field(default=None, gt=0, le=150)
     care_context: Literal["owned", "foster", "community"] = "owned"
+
+    @field_validator("name")
+    @classmethod
+    def clean_name(cls, value: str) -> str:
+        value = value.strip()
+        if not value:
+            raise ValueError("Dog name cannot be blank")
+        return value
 
     @model_validator(mode="after")
     def check_ages(self) -> "DogCreate":
@@ -25,6 +33,16 @@ class DogCreate(BaseModel):
 
 class DogPatch(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=80)
+
+    @field_validator("name")
+    @classmethod
+    def clean_name(cls, value: str | None) -> str | None:
+        if value is None:
+            raise ValueError("Dog name cannot be null")
+        value = value.strip()
+        if not value:
+            raise ValueError("Dog name cannot be blank")
+        return value
     breed_reported: str | None = Field(default=None, max_length=120)
     weight_kg: float | None = Field(default=None, gt=0, le=150)
 
@@ -107,4 +125,10 @@ class DogOverview(BaseModel):
     generated_on: date
     status: Literal["records_only_no_clinical_assessment"]
 
-# Extended payload validation models for client transport
+
+T = TypeVar("T")
+
+
+class CursorPage(BaseModel, Generic[T]):
+    items: list[T]
+    next_cursor: str | None = None

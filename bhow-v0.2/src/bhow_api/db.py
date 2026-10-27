@@ -28,5 +28,3 @@ def get_session_factory() -> sessionmaker[Session]:
 def get_db() -> Iterator[Session]:
     with get_session_factory()() as session:
         yield session
-
-# Pool recycling and connection timeout parameters tuned

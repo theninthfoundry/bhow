@@ -2,11 +2,11 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from bhow_api.db import get_db
-from bhow_api.models import CareEvent, CareTask, Dog, DogCaregiver
+from bhow_api.models import Dog, DogCaregiver, IdempotencyRecord
 from bhow_api.schemas import DogOut, EventOut, PrincipalOut, TaskOut
 from bhow_api.security import Principal, current_principal
 
@@ -46,6 +46,7 @@ def delete_account_data(user: User, db: Db) -> None:
             continue
         if any(c.subject != user.subject for c in dog.caregivers):
             raise HTTPException(status_code=409, detail="Shared dog records require a transfer or access revocation first")
+        db.execute(delete(IdempotencyRecord).where(IdempotencyRecord.dog_id == dog.id))
         db.delete(dog)
     db.commit()
     # IMPORTANT: identity provider account deletion must happen there separately.
