@@ -55,7 +55,7 @@ def create_app() -> FastAPI:
         try:
             with get_engine().connect() as conn:
                 version = conn.execute(text("SELECT version_num FROM alembic_version")).scalar_one_or_none()
-                if version != "0002":
+                if version not in ("0002", "0003"):
                     raise HTTPException(status_code=503, detail="Database schema not current")
                 conn.execute(text("SELECT 1 FROM dogs LIMIT 1"))
                 conn.execute(text("SELECT 1 FROM idempotency_records LIMIT 1"))

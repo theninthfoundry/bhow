@@ -12,7 +12,7 @@ from bhow_api.idempotency import persist_once
 from bhow_api.models import CareEvent, CareTask
 from bhow_api.pagination import decode_cursor, encode_cursor
 from bhow_api.permissions import authorized_dog
-from bhow_api.schemas import CursorPage, EventCreate, EventOut, TaskCreate, TaskOut
+from bhow_api.schemas import CursorPage, EventCorrectionCreate, EventCreate, EventOut, TaskCreate, TaskOut
 from bhow_api.security import Principal, current_principal
 
 router = APIRouter(prefix="/dogs/{dog_id}", tags=["care"])
@@ -30,6 +30,30 @@ def create_event(dog_id: UUID, payload: EventCreate, user: User, db: Db, idempot
         payload=payload.model_dump(mode="json"),
         create=lambda: CareEvent(dog_id=str(dog_id), **payload.model_dump(), source="caregiver",
                                  verified=False, created_by=user.subject),
+        lookup=lambda rid: db.get(CareEvent, rid),
+    )
+
+
+@router.post("/events/{event_id}/correct", response_model=EventOut, status_code=201)
+def correct_event(dog_id: UUID, event_id: UUID, payload: EventCorrectionCreate, user: User, db: Db, idempotency_key: Key = None) -> CareEvent:
+    authorized_dog(db, str(dog_id), user.subject)
+    prior = db.scalar(select(CareEvent).where(CareEvent.id == str(event_id), CareEvent.dog_id == str(dog_id)))
+    if prior is None:
+        raise HTTPException(status_code=404, detail="Original care event not found")
+    data = payload.model_dump()
+    reason = data.pop("correction_reason")
+    return persist_once(
+        db, actor=user.subject, dog_id=str(dog_id), operation="correct_event", key=idempotency_key,
+        payload=payload.model_dump(mode="json"),
+        create=lambda: CareEvent(
+            dog_id=str(dog_id),
+            **data,
+            supersedes_event_id=str(event_id),
+            correction_reason=reason,
+            source="caregiver",
+            verified=False,
+            created_by=user.subject,
+        ),
         lookup=lambda rid: db.get(CareEvent, rid),
     )
 

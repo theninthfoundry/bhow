@@ -17,7 +17,7 @@ mypy --strict src/bhow_core
 pytest -q
 cd ..
 git add README.md RELEASE_NOTES.md INSTALL_INTO_GITHUB.md SHA256SUMS.txt .github bhow-v0.2
-git commit -m "fix: Bhow v0.3.1 CI and staging guardrails"
+git commit -m "feat: Bhow Phase 1 implementation (passport, corrections, emergency ingestion, dual-db recovery)"
 git push origin main
 ```
 

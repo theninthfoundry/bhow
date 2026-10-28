@@ -13,6 +13,11 @@ class DogCreate(BaseModel):
     breed_reported: str | None = Field(default=None, max_length=120)
     weight_kg: float | None = Field(default=None, gt=0, le=150)
     care_context: Literal["owned", "foster", "community"] = "owned"
+    allergies_reported: str | None = Field(default=None, max_length=1000)
+    conditions_reported: str | None = Field(default=None, max_length=1000)
+    medications_reported: str | None = Field(default=None, max_length=1000)
+    microchip_id: str | None = Field(default=None, max_length=64)
+    veterinarian_contact: str | None = Field(default=None, max_length=1000)
 
     @field_validator("name")
     @classmethod
@@ -45,6 +50,11 @@ class DogPatch(BaseModel):
         return value
     breed_reported: str | None = Field(default=None, max_length=120)
     weight_kg: float | None = Field(default=None, gt=0, le=150)
+    allergies_reported: str | None = Field(default=None, max_length=1000)
+    conditions_reported: str | None = Field(default=None, max_length=1000)
+    medications_reported: str | None = Field(default=None, max_length=1000)
+    microchip_id: str | None = Field(default=None, max_length=64)
+    veterinarian_contact: str | None = Field(default=None, max_length=1000)
 
 
 class DogOut(BaseModel):
@@ -56,6 +66,11 @@ class DogOut(BaseModel):
     breed_reported: str | None
     weight_kg: float | None
     care_context: str
+    allergies_reported: str | None = None
+    conditions_reported: str | None = None
+    medications_reported: str | None = None
+    microchip_id: str | None = None
+    veterinarian_contact: str | None = None
     created_at: datetime
 
 
@@ -63,6 +78,13 @@ class EventCreate(BaseModel):
     kind: Literal["weight", "vaccination", "visit", "symptom", "nutrition", "milestone", "other"]
     notes: str = Field(min_length=1, max_length=3000)
     occurred_on: date
+
+
+class EventCorrectionCreate(BaseModel):
+    kind: Literal["weight", "vaccination", "visit", "symptom", "nutrition", "milestone", "other"]
+    notes: str = Field(min_length=1, max_length=3000)
+    occurred_on: date
+    correction_reason: str = Field(min_length=1, max_length=1000)
 
 
 class EventOut(BaseModel):
@@ -73,6 +95,8 @@ class EventOut(BaseModel):
     occurred_on: date
     source: str
     verified: bool
+    supersedes_event_id: UUID | None = None
+    correction_reason: str | None = None
     recorded_at: datetime
 
 
@@ -108,6 +132,7 @@ class FoodCheckOut(BaseModel):
     flagged: list[FoodFlag]
     summary: str
     next_step: str
+    emergency_escalation: dict[str, str] | None = None
     kb_release_status: str = "educational_preview_not_vet_reviewed"
 
 

@@ -26,6 +26,11 @@ class Dog(Base):
     breed_reported: Mapped[str | None] = mapped_column(String(120), nullable=True)
     weight_kg: Mapped[float | None] = mapped_column(Numeric(6, 2, asdecimal=False), nullable=True)
     care_context: Mapped[str] = mapped_column(String(24), default="owned", nullable=False)
+    allergies_reported: Mapped[str | None] = mapped_column(Text, nullable=True)
+    conditions_reported: Mapped[str | None] = mapped_column(Text, nullable=True)
+    medications_reported: Mapped[str | None] = mapped_column(Text, nullable=True)
+    microchip_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    veterinarian_contact: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, onupdate=utcnow)
 
@@ -57,8 +62,10 @@ class CareEvent(Base):
     source: Mapped[str] = mapped_column(String(24), default="caregiver", nullable=False)
     verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_by: Mapped[str] = mapped_column(String(255), nullable=False)
+    supersedes_event_id: Mapped[str | None] = mapped_column(ForeignKey("care_events.id", ondelete="SET NULL"), nullable=True)
+    correction_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
-    dog: Mapped[Dog] = relationship(back_populates="events")
+    dog: Mapped[Dog] = relationship(back_populates="events", foreign_keys=[dog_id])
 
 
 class CareTask(Base):

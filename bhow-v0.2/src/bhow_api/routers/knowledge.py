@@ -12,6 +12,19 @@ router = APIRouter(tags=["knowledge"])
 @router.post("/food/check", response_model=FoodCheckOut)
 def check_food(payload: FoodCheckIn) -> FoodCheckOut:
     flagged = classify_ingredients(payload.ingredients_text, food_rules())
+    emergency_guidance = (
+        {
+            "urgency": "immediate",
+            "action": "Contact a licensed emergency veterinarian or animal poison control helpline immediately.",
+            "instructions": (
+                "Do not attempt to induce vomiting or administer home remedies without explicit professional instruction. "
+                "Retain packaging, ingredient labels, and note the estimated time and amount consumed for the clinician."
+            ),
+            "disclaimer": "Bhow provides educational reference only and cannot diagnose toxicity or compute safe dosages.",
+        }
+        if payload.already_eaten
+        else None
+    )
     if flagged:
         return FoodCheckOut(
             status="potential_hazard",
@@ -22,12 +35,14 @@ def check_food(payload: FoodCheckIn) -> FoodCheckOut:
                 if payload.already_eaten else
                 "Do not offer this food. Check the full label with a veterinary professional if uncertain."
             ),
+            emergency_escalation=emergency_guidance,
         )
     return FoodCheckOut(
         status="unknown",
         flagged=[],
         summary="No match in our LIMITED preview reference; this does NOT mean safe for dogs.",
         next_step=("If potentially harmful food was eaten, call a veterinarian now." if payload.already_eaten else "Ask a veterinarian before offering unfamiliar products."),
+        emergency_escalation=emergency_guidance,
     )
 
 
